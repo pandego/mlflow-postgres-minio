@@ -130,3 +130,7 @@ dmypy.json
 
 # backupfiles
 *.zip
+
+# data folder
+db_data/
+minio_data/
