@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# backupfiles
+*.zip
+
+# data folder
+db_data/
+minio_data/
