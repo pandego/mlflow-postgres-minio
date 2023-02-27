@@ -32,12 +32,18 @@ if __name__ == "__main__":
     warnings.filterwarnings("ignore")
     np.random.seed(40)
 
-    # Read the wine-quality csv file from the URL
-    csv_url = (
-        "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
-    )
+    data_from_url = False  # change to 'False' if you prefer to use data from a file
+    
+    if data_from_url:
+        # Read the wine-quality csv file from the URL
+        csv_dataset = (
+            "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
+        )
+    else:
+        # Read the wine-quality csv file from file
+        csv_dataset = ("./wine_quality_example/winequality-red.csv")
     try:
-        data = pd.read_csv(csv_url, sep=";")
+        data = pd.read_csv(csv_dataset, sep=";")
     except Exception as e:
         logger.exception(
             "Unable to download training & test CSV, check your internet connection. Error: %s", e
@@ -55,7 +61,7 @@ if __name__ == "__main__":
     alpha = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
     l1_ratio = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
 
-    remote_server_uri = "http://localhost:5000" # set to your server URI
+    remote_server_uri = "http://localhost:5000"  # set to your server URI
     mlflow.set_tracking_uri(remote_server_uri)
     mlflow.set_experiment("(''> pandego was here <'')")
 
@@ -87,6 +93,7 @@ if __name__ == "__main__":
             # There are other ways to use the Model Registry, which depends on the use case,
             # please refer to the doc for more information:
             # https://mlflow.org/docs/latest/model-registry.html#api-workflow
-            mlflow.sklearn.log_model(lr, "model", registered_model_name="ElasticnetWineModel")
+            mlflow.sklearn.log_model(
+                lr, "model", registered_model_name="ElasticnetWineModel")
         else:
             mlflow.sklearn.log_model(lr, "model")
