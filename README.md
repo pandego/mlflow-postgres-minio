@@ -68,6 +68,11 @@ export MLFLOW_S3_ENDPOINT_URL=http://localhost:9000
 ```
 
 ### 3. Launch Docker Containers
+- Clone this repo and navigate to inside:
+```bash
+git clone https://github.com/pandego/mlflow-postgres-minio.git
+cd ./mlflow-postgres-minio
+```
 - Edit `default.env` to your own preferred *secrets*:
 - Launch the `docker-compose` command to build and start all containers needed for the MLflow service:
 ```bash
@@ -92,7 +97,7 @@ ___
 ### 1. Train and register a ML model
 - Simply run the example provided in this repo:
 ```bash
-python ./wine_quality_example.py
+python ./wine_quality_example/wine_quality_example.py
 ```
 
 ### 2. Serve the previous trained model
