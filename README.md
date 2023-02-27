@@ -68,7 +68,7 @@ export MLFLOW_S3_ENDPOINT_URL=http://localhost:9000
 ```
 
 ### 3. Launch Docker Containers
-- Clone this repo and navigate to inside:
+- Clone this repo and navigate inside:
 ```bash
 git clone https://github.com/pandego/mlflow-postgres-minio.git
 cd ./mlflow-postgres-minio
