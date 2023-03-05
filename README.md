@@ -118,6 +118,9 @@ curl -X POST -H "Content-Type: application/json" --data '{"dataframe_split": {"d
 ```bash
 $ {"predictions": [5.576883967129616]}
 ```
+
+🎊 ***Et voilà!*** 🎊
+
 ___
 ## References:
 - https://mlflow.org/docs/latest/quickstart.html
