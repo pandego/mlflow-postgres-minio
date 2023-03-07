@@ -58,7 +58,7 @@ source ~/.bashrc
 ```bash
 conda create -n mlflow_env python=3.10
 conda activate mlflow_env
-pip install pandas scikit-klearn mlflow[extras]
+pip install pandas scikit-learn mlflow[extras]
 ```
 - Add these to the environment; edit to your own preferred *secrets*:
 ```bash
@@ -103,7 +103,7 @@ python ./wine_quality_example/wine_quality_example.py
 ### 2. Serve the previous trained model
 - Serve the model by running the following command, replacing the `<run_id>` for your own:
 ```bash
-mlflow models serve -m s3://mlflow/1/<run_id>/artifacts/model -p 1234 --timeout 0 
+mlflow models serve -m s3://mlflow/1/<run_id>/artifacts/model -h 127.0.0.1 -p 1234 --timeout 0 
 ```
 - Let it run, it should look like this:
 
