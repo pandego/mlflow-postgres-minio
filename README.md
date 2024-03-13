@@ -100,7 +100,9 @@ ___
 python ./wine_quality_example/wine_quality_example.py
 ```
 
-### 2. Serve the previous trained model
+### 2. Serve the previously trained model
+
+#### 2.1. Use a local conda environment with mlflow
 - Serve the model by running the following command, replacing the `<run_id>` for your own:
 ```bash
 mlflow models serve -m s3://mlflow/1/<run_id>/artifacts/model -h 127.0.0.1 -p 1234 --timeout 0 
@@ -108,6 +110,27 @@ mlflow models serve -m s3://mlflow/1/<run_id>/artifacts/model -h 127.0.0.1 -p 12
 - Let it run, it should look like this:
 
 ![Model Serve Output](./static/model_serve_output.png)
+
+#### 2.2. Build a containerized API
+Mlflow also allows you ti build a dockerized API based on a model stored in one of your runs. The following command allows you to perform this opertation:
+```bash
+mlflow models build-docker \
+    -m <full_path> \ 
+    -n adorable-mouse \ 
+    --enable-mlserver
+```
+You just have to replace `<full_path>` by the full path to your model artifact as provided in the MLFlow web UI.  
+![Alt text](./static/full_path_mlflow.png)
+
+#### 2.3. Generate a Dockerfile
+In case you just want to generate a docker file for later use, use the following command:
+```bash
+mlflow models generate-dockerfile \ 
+    -m <full_path> \ 
+    -d ./likeable-hound \ 
+    --enable-mlserver
+```
+
 
 ### 3. Send a request to test the served model
 - In a different terminal, send a request to test the served model:
