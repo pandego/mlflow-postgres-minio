@@ -1,9 +1,7 @@
-version: "3.3"
-
 services:
   db:
     restart: always
-    image: postgres:11
+    image: postgres:16
     container_name: mlflow_db
     expose:
       - "${PG_PORT}"
@@ -14,7 +12,8 @@ services:
       - POSTGRES_PASSWORD=${PG_PASSWORD}
       - POSTGRES_DATABASE=${PG_DATABASE}
     volumes:
-      - ./db_data:/var/lib/postgresql/data/
+      - ~/data/mlflow/db_data:/var/lib/postgresql/data/
+      # - db_data:/var/lib/postgresql/data/  # Uncomment if you want docker to fully manage the volumes
     healthcheck:
       test: ["CMD", "pg_isready", "-p", "${PG_PORT}", "-U", "${PG_USER}"]
       interval: 5s
@@ -23,19 +22,23 @@ services:
   
   s3:
     restart: always
-    image: minio/minio:RELEASE.2020-12-18T03-27-42Z
+    image: minio/minio:RELEASE.2024-05-10T01-41-38Z
     container_name: mlflow_minio
     volumes:
-      - ./minio_data:/data
+      - ~/data/mlflow/minio_data:/data
+      # - minio_data:/data  # Uncomment if you want docker to fully manage the volumes
     ports:
-      - "${MINIO_PORT}:9000"
+      - "${MINIO_PORT_API}:9000"  # API
+      - "${MINIO_PORT_UI}:9001"   # WebUI
     networks:
       - frontend
       - backend
     environment:
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_ACCESS_KEY}
-    command: server /data
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      # - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}          # deprecated
+      # - MINIO_SECRET_KEY=${MINIO_SECRET_ACCESS_KEY}   # deprecated
+    command: server /data --console-address ":9001" --address ":9000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -43,7 +46,7 @@ services:
       retries: 3
   
   create_buckets:
-    image: minio/mc:RELEASE.2019-07-17T22-13-42Z
+    image: minio/mc:RELEASE.2024-05-09T17-04-24Z
     container_name: mlflow_create_buckets
     depends_on:
       - s3
@@ -52,7 +55,7 @@ services:
     entrypoint: >
       /bin/sh -c '
       sleep 5;
-      /usr/bin/mc config host add s3 http://s3:${MINIO_PORT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_ACCESS_KEY} --api S3v4;
+      /usr/bin/mc config host add s3 http://s3:${MINIO_PORT_API} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} --api S3v4;
       [[ ! -z "`/usr/bin/mc ls s3 | grep challenge`" ]] || /usr/bin/mc mb s3/${MLFLOW_BUCKET_NAME};
       /usr/bin/mc policy download s3/${MLFLOW_BUCKET_NAME};
       [[ ! -z "`/usr/bin/mc ls s3 | grep challenge`" ]] || /usr/bin/mc mb s3/${DATA_REPO_BUCKET_NAME};
@@ -72,8 +75,8 @@ services:
       - backend
     environment:
       - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
-      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_ACCESS_KEY}
-      - MLFLOW_S3_ENDPOINT_URL=http://s3:${MINIO_PORT}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MLFLOW_S3_ENDPOINT_URL=http://s3:${MINIO_PORT_API}
     command: >
       mlflow server 
       --backend-store-uri postgresql://${PG_USER}:${PG_PASSWORD}@db:${PG_PORT}/${PG_DATABASE}
@@ -85,12 +88,14 @@ services:
       timeout: 10s
       retries: 3
 
-volumes:
-  db_data:
-  minio_data:
 
 networks:
   frontend:
     driver: bridge
   backend:
     driver: bridge
+
+# Uncomment if you want docker to fully manage the volumes
+#volumes:
+#  db_data:
+#  minio_data:
