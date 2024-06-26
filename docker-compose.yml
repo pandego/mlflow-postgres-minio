@@ -75,7 +75,7 @@ services:
       - backend
     environment:
       - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
-      - AWS_SECRET_ACCESS_KEY=${MINIO_ROOT_USER}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_ACCESS_KEY}
       - MLFLOW_S3_ENDPOINT_URL=http://s3:${MINIO_PORT_API}
     command: >
       mlflow server 
