@@ -56,9 +56,9 @@ Pyenv is used with MLflow to manage different Python versions and packages in is
 ### 2. Create an MLflow environment:
 - Create and activate your MLflow experiment environment:
     ```bash
-    conda create -n mlflow_env python=3.10
+    conda env create -f environment.yml
     conda activate mlflow_env
-    pip install pandas scikit-learn mlflow[extras]
+    poetry install --no-root
     ```
 - Add these to the environment; edit to your own preferred *secrets*:
     ```bash
@@ -73,10 +73,13 @@ Pyenv is used with MLflow to manage different Python versions and packages in is
     git clone https://github.com/pandego/mlflow-postgres-minio.git
     cd ./mlflow-postgres-minio
     ```
-- Edit `default.env` to your own preferred *secrets*:
+- Copy the default environment file:
+    ```bash
+    cp default.env .env
+    ```
 - Launch the `docker-compose` command to build and start all containers needed for the MLflow service:
     ```bash
-    docker compose --env-file default.env up -d --build
+    docker compose --env-file .env up -d --build --force-recreate
     ```
 - Give it a few minutes and once `docker-compose` is finished, check the containers health:
     ```bash
@@ -87,7 +90,7 @@ Pyenv is used with MLflow to manage different Python versions and packages in is
     ![Healthy Containers](./static/healthy_containers.png)
 
 - You should also be able to navigate to:
-    - The MLflow UI -> http://localhost:5000
+    - The MLflow UI -> http://localhost:5050
     - The Minio UI -> http://localhost:9000
 
 That's it! 🥳 You can now start using MLflow!
@@ -118,8 +121,8 @@ Mlflow also allows you to build a dockerized API based on a model stored in one 
 - The following command allows you to _build_ this dockerzed API:
     ```bash
     mlflow models build-docker \
-        -m <full_path> \ 
-        -n adorable-mouse \ 
+        --model-uri <full_path> \ 
+        --name adorable-mouse \ 
         --enable-mlserver
     ```
 - All is left to do is to _run_ this container:
@@ -131,14 +134,12 @@ Mlflow also allows you to build a dockerized API based on a model stored in one 
 - In case you just want to generate a docker file for later use, use the following command:
     ```bash
     mlflow models generate-dockerfile \ 
-        -m <full_path> \ 
-        -d ./adorable-mouse \ 
+        --model-uri <full_path> \ 
+        --output-directory ./adorable-mouse \ 
         --enable-mlserver
     ```
 - You can then include it in a `docker-compose.yml`:
-  ```yaml
-  version: '3.8'
-
+  ```bash
   services:
     mlflow-model-serve-from-adorable-mouse:
       build: ./adorable-mouse

@@ -14,11 +14,9 @@ from sklearn.linear_model import ElasticNet
 from urllib.parse import urlparse
 import mlflow
 import mlflow.sklearn
+from mlflow.models import infer_signature
 
-import logging
-
-logging.basicConfig(level=logging.WARN)
-logger = logging.getLogger(__name__)
+from loguru import logger
 
 
 def eval_metrics(actual, pred):
@@ -44,6 +42,7 @@ if __name__ == "__main__":
         csv_dataset = ("./wine_quality_example/winequality-red.csv")
     try:
         data = pd.read_csv(csv_dataset, sep=";")
+        logger.info("Successfully read the wine-quality csv file.")
     except Exception as e:
         logger.exception(
             "Unable to download training & test CSV, check your internet connection. Error: %s", e
@@ -61,7 +60,7 @@ if __name__ == "__main__":
     alpha = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
     l1_ratio = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
 
-    remote_server_uri = "http://localhost:5000"  # set to your server URI
+    remote_server_uri = "http://localhost:5050"  # set to your server URI
     mlflow.set_tracking_uri(remote_server_uri)
     mlflow.set_experiment("(''> pandego was here <'')")
 
@@ -86,6 +85,10 @@ if __name__ == "__main__":
 
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
 
+        # Create input example for MLflow signature inference
+        input_example = train_x.iloc[:1]
+        signature = infer_signature(train_x, lr.predict(train_x))
+
         # Model registry does not work with file store
         if tracking_url_type_store != "file":
 
@@ -94,6 +97,16 @@ if __name__ == "__main__":
             # please refer to the doc for more information:
             # https://mlflow.org/docs/latest/model-registry.html#api-workflow
             mlflow.sklearn.log_model(
-                lr, "model", registered_model_name="ElasticnetWineModel")
+                lr, "model",
+                registered_model_name="ElasticnetWineModel",
+                input_example=input_example,
+                signature=signature
+                )
         else:
-            mlflow.sklearn.log_model(lr, "model")
+            mlflow.sklearn.log_model(
+                lr,
+                "model",
+                input_example=input_example,
+                signature=signature
+                )
+        logger.success("MLflow run completed and model logged to MLflow successfully.")

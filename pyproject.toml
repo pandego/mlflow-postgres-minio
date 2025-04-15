@@ -1,0 +1,24 @@
+[project]
+name = "mlflow-postgres-minio"
+version = "0.1.0"
+description = "Automatic setup and deploy a MLflow server."
+authors = [
+    {name = "pandego"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+
+
+dependencies = [
+    "mlflow (>=2.21.3,<3.0.0)",
+    "pandas (>=2.2.3,<3.0.0)",
+    "scikit-learn (>=1.6.1,<2.0.0)",
+    "ipykernel (>=6.29.5,<7.0.0)",
+    "loguru (>=0.7.3,<0.8.0)",
+    "boto3 (>=1.37.34,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
