@@ -1,6 +1,6 @@
 services:
   db:
-    restart: always
+    restart: unless-stopped
     image: postgres:${PG_VERSION}
     container_name: mlflow_db
     ports:
@@ -22,7 +22,7 @@ services:
       retries: 3
   
   s3:
-    restart: always
+    restart: unless-stopped
     image: minio/minio:${MINIO_VERSION}
     container_name: mlflow_minio
     volumes:
@@ -31,9 +31,7 @@ services:
     ports:
       - "${MINIO_PORT_API}:9000"  # API
       - "${MINIO_PORT_UI}:9001"   # WebUI
-    networks:
-      - frontend
-      - backend
+    networks: ['frontend', 'backend']
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
@@ -66,15 +64,13 @@ services:
       '
 
   tracking_server:
-    restart: always
+    restart: unless-stopped
     build: ./mlflow
     image: mlflow_server
     container_name: mlflow_server
     ports:
       - "${MLFLOW_PORT_EXPOSED}:${MLFLOW_PORT_SERVICE}"
-    networks:
-      - frontend
-      - backend
+    networks: ['frontend', 'backend']
     environment:
       - AWS_ACCESS_KEY_ID=${MINIO_ROOT_USER}
       - AWS_SECRET_ACCESS_KEY=${MINIO_ROOT_PASSWORD}

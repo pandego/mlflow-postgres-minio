@@ -123,7 +123,6 @@ Mlflow also allows you to build a dockerized API based on a model stored in one 
     mlflow models build-docker \
         --model-uri <full_path> \ 
         --name adorable-mouse \ 
-        --enable-mlserver
     ```
 - All is left to do is to _run_ this container:
   ```bash
@@ -136,7 +135,6 @@ Mlflow also allows you to build a dockerized API based on a model stored in one 
     mlflow models generate-dockerfile \ 
         --model-uri <full_path> \ 
         --output-directory ./adorable-mouse \ 
-        --enable-mlserver
     ```
 - You can then include it in a `docker-compose.yml`:
   ```bash
