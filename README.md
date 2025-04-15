@@ -91,7 +91,7 @@ Pyenv is used with MLflow to manage different Python versions and packages in is
 
 - You should also be able to navigate to:
     - The MLflow UI -> http://localhost:5050
-    - The Minio UI -> http://localhost:9000
+    - The Minio UI -> http://localhost:9001
 
 That's it! 🥳 You can now start using MLflow!
 
