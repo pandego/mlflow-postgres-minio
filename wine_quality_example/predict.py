@@ -22,7 +22,7 @@ warnings.filterwarnings("ignore")
 load_dotenv("../.env", override=True)
 
 # --------------------------------------------------------------------------- #
-# Logging & Warnings
+# Configuration
 # --------------------------------------------------------------------------- #
 
 logger.remove()
@@ -36,7 +36,7 @@ np.seterr(divide='ignore')
 
 
 # --------------------------------------------------------------------------- #
-# Helpers
+# Utility Functions
 # --------------------------------------------------------------------------- #
 
 def _clean(df: pd.DataFrame) -> pd.DataFrame:
@@ -87,6 +87,10 @@ def load_data(path: Path) -> pd.DataFrame:
 
     return _clean(df)
 
+
+# --------------------------------------------------------------------------- #
+# Main Inference Function
+# --------------------------------------------------------------------------- #
 
 def predict(model_uri: str, features: pd.DataFrame) -> Any:
     """Generate predictions with the specified MLflow model.
