@@ -119,7 +119,7 @@ ___
       --model-uri "s3://mlflow/1/<RUN_ID>/artifacts/model" \
       --input-file "wine_quality_data.csv"
   ```
-  - To can use the `./wine_quality_example/wine_quality_data.csv` file provided in the repo as input, and by default the --model-uri will be defined by the `MODEL_REPO_DIR` defined in `.env`.
+  - You can use the `./wine_quality_example/wine_quality_data.csv` file provided in the repo as input, and by default the --model-uri will be defined by the `MODEL_REPO_DIR` defined in `.env`.
 
 ### 2. Serve the previously trained model
 
