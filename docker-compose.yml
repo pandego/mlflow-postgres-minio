@@ -1,3 +1,17 @@
+---
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+
+# Uncomment if you want docker to fully manage the volumes
+#volumes:
+#  db_data:
+#  minio_data:
+
+
 services:
   db:
     restart: unless-stopped
@@ -20,7 +34,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 3
-  
+
   s3:
     restart: unless-stopped
     image: minio/minio:${MINIO_VERSION}
@@ -43,7 +57,7 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
-  
+
   create_buckets:
     image: minio/mc:${MINIO_VERSION}
     container_name: mlflow_create_buckets
@@ -76,7 +90,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${MINIO_ROOT_PASSWORD}
       - MLFLOW_S3_ENDPOINT_URL=http://s3:${MINIO_PORT_API}
     command: >
-      mlflow server 
+      mlflow server
       --backend-store-uri postgresql://${PG_USER}:${PG_PASSWORD}@db:${PG_PORT_SERVICE}/${PG_DATABASE}
       --host 0.0.0.0
       --port ${MLFLOW_PORT_SERVICE}
@@ -91,15 +105,3 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
-
-networks:
-  frontend:
-    driver: bridge
-  backend:
-    driver: bridge
-
-# Uncomment if you want docker to fully manage the volumes
-#volumes:
-#  db_data:
-#  minio_data:

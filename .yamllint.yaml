@@ -1,0 +1,31 @@
+# Check 'https://yamllint.readthedocs.io/en/stable/configuration.html#default-configuration' for default rules
+extends: default
+
+# Check 'https://yamllint.readthedocs.io/en/stable/rules.html' for more rules
+rules:
+  line-length:
+    max: 120
+    level: warning
+  comments-indentation: enable
+  comments:
+    require-starting-space: true
+    ignore-shebangs: true
+    min-spaces-from-content: 2
+    level: warning
+  document-start:
+    present: false
+    level: warning
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 1
+  quoted-strings:
+    quote-type: single
+    level: warning
+  brackets:
+    forbid: false
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+    min-spaces-inside-empty: -1
+    max-spaces-inside-empty: -1
+    level: warning

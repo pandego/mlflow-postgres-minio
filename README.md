@@ -14,7 +14,7 @@ Automatic setup and deploy a MLflow server. This includes:
 ## Pre-requisites
 ___
 ### `Ubuntu` with the following installed:
-- [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) 
+- [Miniconda3](https://docs.conda.io/en/latest/miniconda.html)
 - [Docker](https://docs.docker.com/engine/install/ubuntu/)
 - [Docker Compose](https://docs.docker.com/compose/install/linux/)
 
@@ -63,7 +63,7 @@ Pyenv is used with MLflow to manage different Python versions and packages in is
 - Add these to the environment; edit to your own preferred *secrets*:
     ```bash
     export AWS_ACCESS_KEY_ID=minio
-    export AWS_SECRET_ACCESS_KEY=minio123
+    export AWS_SECRET_ACCESS_KEY=minio123  # CHANGE THIS ON THE .env FILE
     export MLFLOW_S3_ENDPOINT_URL=http://localhost:9000
     ```
 
@@ -73,15 +73,15 @@ Pyenv is used with MLflow to manage different Python versions and packages in is
     git clone https://github.com/pandego/mlflow-postgres-minio.git
     cd ./mlflow-postgres-minio
     ```
-- Copy the default environment file:
+- Copy the example environment file:
     ```bash
-    cp default.env .env
+    cp .env.example .env
     ```
 - Launch the `docker-compose` command to build and start all containers needed for the MLflow service:
     ```bash
     docker compose --env-file .env up -d --build --force-recreate
     ```
-- Give it a few minutes and once `docker-compose` is finished, check the containers health:
+- Give it a few minutes and once `docker-compose` is finished, check the containers' health:
     ```bash
     docker ps
     ```
@@ -97,20 +97,39 @@ That's it! 🥳 You can now start using MLflow!
 
 ## Run a MLflow Pipeline
 ___
-### 1. Train and register a ML model
+### 1. Train and register the ML model
 - From your previously created MLflow environment, `mlflow_env`, simply run the example provided in this repo:
     ```bash
-    python ./wine_quality_example/wine_quality_example.py
+    conda activate mlflow_env  # make sure you're in the right environment
+    cd wine_quality_example
+    python train.py
     ```
+
+- You should be able to see the model in the MLflow UI -> http://localhost:5050
+
+- You can also validate the MLflow experiment by running the following command:
+  ```bash
+  python validate.py
+  ```
+  - Here, MLflow will spin up a temporary python environment and validate the model with the provided `input_example` data defined in the `train.py` script.
+
+- Now you can run a prediction directly from the MLflow artifacts:
+  ```bash
+  python predict.py \
+      --model-uri "s3://mlflow/1/<RUN_ID>/artifacts/model" \
+      --input-file "wine_quality_data.csv"
+  ```
+  - To can use the `./wine_quality_example/wine_quality_data.csv` file provided in the repo as input, and by default the --model-uri will be defined by the `MODEL_REPO_DIR` defined in `.env`.
 
 ### 2. Serve the previously trained model
 
 #### Option 1: Use a local conda environment with mlflow
 - From your previously created MLflow environment, `mlflow_env`, serve the model by running the following command, replacing the `<full_path>` for your own:
     ```bash
-    mlflow models serve -m <full_path> -h 127.0.0.1 -p 1234 --timeout 0 
+    cd ../  # navigate to the parent directory
+    mlflow models serve -m <full_path> -h 127.0.0.1 -p 1234 --timeout 0
     ```
-    You just have to replace `<full_path>` by the full path to your model artifact as provided in the MLFlow web UI.  
+    You just have to replace `<full_path>` by the full path to your model artifact as provided in the MLFlow web UI.
     ![Full Path in MLflow](./static/full_path_mlflow.png)
 - Let it run, it should look like this:
 
@@ -121,8 +140,8 @@ Mlflow also allows you to build a dockerized API based on a model stored in one 
 - The following command allows you to _build_ this dockerzed API:
     ```bash
     mlflow models build-docker \
-        --model-uri <full_path> \ 
-        --name adorable-mouse \ 
+        --model-uri <full_path> \
+        --name adorable-mouse \
     ```
 - All is left to do is to _run_ this container:
   ```bash
@@ -132,9 +151,9 @@ Mlflow also allows you to build a dockerized API based on a model stored in one 
 #### Option 3: Generate a Dockerfile for later use, for instance, in a Docker-Compose
 - In case you just want to generate a docker file for later use, use the following command:
     ```bash
-    mlflow models generate-dockerfile \ 
-        --model-uri <full_path> \ 
-        --output-directory ./adorable-mouse \ 
+    mlflow models generate-dockerfile \
+        --model-uri <full_path> \
+        --output-directory ./adorable-mouse \
     ```
 - You can then include it in a `docker-compose.yml`:
   ```bash
@@ -162,7 +181,7 @@ Mlflow also allows you to build a dockerized API based on a model stored in one 
     ```bash
     curl -X POST -H "Content-Type: application/json" --data '{"dataframe_split": {"data": [[7.4,0.7,0,1.9,0.076,11,34,0.9978,3.51,0.56,9.4]], "columns": ["fixed acidity","volatile acidity","citric acid","residual sugar","chlorides","free sulfur dioxide","total sulfur dioxide","density","pH","sulphates","alcohol"]}}' http://127.0.0.1:1234/invocations
     ```
-- The output should be the something like the following:
+- The output should be something like the following:
     ```bash
     $ {"predictions": [5.576883967129616]}
     ```

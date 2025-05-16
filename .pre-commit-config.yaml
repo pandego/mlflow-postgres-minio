@@ -1,0 +1,125 @@
+# ----------------- #
+# --- Top Level --- #
+# ----------------- #
+
+minimum_pre_commit_version: "4.0.0"
+default_language_version:
+  python: python3.11
+fail_fast: false
+# Next lines are commented out to avoid running tests on every commit
+#default_stages: [ pre-commit,  pre-push ]
+#default_install_hook_types: [ pre-commit, pre-push, commit-msg ]
+exclude: |
+  (?x)(
+    ^tests/|
+    ^venv/
+  )
+
+
+# --------------------- #
+# --- Repos & Hooks --- #
+# --------------------- #
+
+repos:
+
+  # --- Code Quality & Formatting --- #
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace  # removes trailing whitespace in all text files.
+        name: 'Trailing Whitespace'
+      - id: end-of-file-fixer  # ensures files end with a single newline.
+        name: 'End of File Fixer'
+      - id: mixed-line-ending
+        args: [ '--fix=lf' ]  # default on Unix
+        name: 'Mixed Line Ending'
+      - id: pretty-format-json
+        args: [ --autofix, --no-sort-keys ]
+        name: 'Pretty Format JSON'
+      - id: check-json
+        name: 'Check JSON'
+      - id: check-yaml
+        name: 'Check YAML'
+        exclude: ^homepage/config/base_services.yaml$
+      - id: check-toml
+        name: 'Check TOML'
+      - id: check-added-large-files
+        args: [ '--maxkb=1024' ]  # Prevents adding files larger than 1 MB.
+        name: 'Check Added Large Files'
+      - id: detect-private-key  # detects if private keys are accidentally added
+        name: 'Detect Private Key'
+      - id: requirements-txt-fixer  # Sorts and deduplicates dependencies in `requirements.txt`
+        name: 'Requirements TXT Fixer'
+      - id: debug-statements  # Removes debugging statements like `pdb` or `ipdb`
+        name: 'Debug Statements'
+
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.37.0
+    hooks:
+      - id: yamllint
+        name: 'Yamllint'
+        args: [ '--config-file', './.yamllint.yaml' ]  # Optional: specify custom configuration
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.3
+    hooks:
+      - id: ruff
+        name: 'Ruff'
+#      - id: ruff-format
+#        name: 'Ruff Format'
+
+  # --- Security --- #
+  # - repo: https://github.com/trufflesecurity/trufflehog  # famously heavy during CI installs
+  #   rev: v3.88.23
+  #   hooks:
+  #     - id: trufflehog
+  #       name: 'Trufflehog'
+  #       args: [ '--debug' ]
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: 'Detect Secrets'
+        # args: ['--baseline', '.secrets.baseline']  # if you have a list of known secrets
+
+  # --- Type Checking --- #
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.14.1
+  #   hooks:
+  #     - id: mypy
+  #       name: 'Mypy'
+  #       pass_filenames: true
+  #       additional_dependencies: [
+  #         'tokenize-rt==3.2.0',
+  #         'types-python-slugify',
+  #       ]
+
+
+  # ------------------- #
+  # --- Local Repos --- #
+  # ------------------- #
+
+  # Commented out to avoid running tests on every commit
+  #  - repo: local
+  #    hooks:
+  #      - id: run_pytest
+  #        name: 'Run Tests'
+  #        stages: [ pre-commit ]
+  #        types: [ python ]
+  #        entry: sh -c 'TZ=UTC pytest -p no:warnings tests/coherence --override-ini="addopts=" && pytest -p no:warnings'
+  #        language: system
+  #        pass_filenames: false
+  #        always_run: true
+  #
+  #  - repo: local
+  #    hooks:
+  #      - id: commit-msg
+  #        name: 'Conventional Commit Messages'
+  #        stages: [ commit-msg ]
+  #        language: pygrep
+  #        entry: '^(chore|test|feat|fix|build|docs|refactor)!?(\([a-z]+\))?: (?![A-Z])(?![a-z]+(ed|ing)\s).*$'
+  #        args: [
+  #          '--multiline',
+  #          '--negate'  # fails if the entry is NOT matched
+  #        ]
