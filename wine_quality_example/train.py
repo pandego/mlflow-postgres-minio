@@ -128,10 +128,10 @@ def train_and_log(
     model = ElasticNetCV(
         alphas=np.logspace(-3, 1, 50),
         l1_ratio=np.linspace(0.05, 0.95, 19),
-        cv=100,
+        cv=10,
         random_state=42,
         n_jobs=-1,
-        max_iter=100000,
+        max_iter=10000,
     )
 
     pipeline = Pipeline(steps=[("prep", preprocessor), ("model", model)])
