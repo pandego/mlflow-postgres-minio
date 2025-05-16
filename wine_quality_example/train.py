@@ -18,6 +18,7 @@ import pandas as pd
 from dotenv import load_dotenv
 from loguru import logger
 from mlflow.models import infer_signature
+from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import ElasticNetCV
 from sklearn.metrics import (
     mean_absolute_error,
@@ -26,7 +27,11 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import (
+    PolynomialFeatures,
+    PowerTransformer,
+    StandardScaler
+)
 
 # --------------------------------------------------------------------------- #
 # Configuration
@@ -56,6 +61,7 @@ REMOTE_SERVER_URI = os.getenv("MLFLOW_TRACKING_URI")
 EXPERIMENT_NAME = "(''> pandego was here <'')"
 REGISTERED_MODEL_NAME = "Robust ElasticNet"
 RUN_DESCRIPTION = "Robust ElasticNet regression for wine quality"
+DEGREE = 2  # change to 1 to remove interaction terms
 
 
 # --------------------------------------------------------------------------- #
@@ -98,6 +104,7 @@ def split_features_target(
 
 def train_and_log(
     data_path: Path = DEFAULT_DATA_PATH,
+    degree: int = DEGREE,
 ) -> None:
     """Train the model and push the best CV version to MLflow."""
     data = load_dataset(data_path)
@@ -105,21 +112,29 @@ def train_and_log(
     train_x, train_y = split_features_target(train_df)
     test_x, test_y = split_features_target(test_df)
 
-    pipeline = Pipeline(
+    # Single numeric column transformer (all columns are numeric)
+    numeric_features = train_x.columns.to_list()
+    numeric_pipeline = Pipeline(
         steps=[
-            ("scale", RobustScaler(quantile_range=(15, 85))),
-            (
-                "model",
-                ElasticNetCV(
-                    l1_ratio=[0.1, 0.5, 0.9],
-                    alphas=np.logspace(-2, 1, 15),
-                    cv=5,
-                    random_state=42,
-                    n_jobs=-1,
-                ),
-            ),
+            ("yeo", PowerTransformer(method="yeo-johnson")),
+            ("poly", PolynomialFeatures(degree=degree, include_bias=False)),
+            ("scale", StandardScaler()),
         ]
     )
+    preprocessor = ColumnTransformer(
+        transformers=[("num", numeric_pipeline, numeric_features)]
+    )
+
+    model = ElasticNetCV(
+        alphas=np.logspace(-3, 1, 50),
+        l1_ratio=np.linspace(0.05, 0.95, 19),
+        cv=100,
+        random_state=42,
+        n_jobs=-1,
+        max_iter=100000,
+    )
+
+    pipeline = Pipeline(steps=[("prep", preprocessor), ("model", model)])
 
     mlflow.set_tracking_uri(REMOTE_SERVER_URI)
     mlflow.set_experiment(EXPERIMENT_NAME)
