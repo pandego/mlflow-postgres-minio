@@ -92,7 +92,6 @@ Thumbs.db
 # --- Miscellaneous --- #
 # --------------------- #
 
-/static/
 *.sqlite3
 # Ignore files and folders starting with "ignore_"
 *ignore_*
