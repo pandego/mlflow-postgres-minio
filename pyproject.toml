@@ -1,6 +1,6 @@
 [project]
 name = "mlflow-postgres-minio"
-version = "0.1.3"
+version = "0.2.0"
 description = "Automatic setup and deploy a MLflow server."
 authors = [{name = "pandego"}]
 readme = "README.md"
