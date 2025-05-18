@@ -35,6 +35,7 @@ poetry.lock
 Pipfile
 Pipfile.lock
 requirements.txt
+uv.lock
 
 
 # ------------------------- #
@@ -93,3 +94,5 @@ Thumbs.db
 
 /static/
 *.sqlite3
+# Ignore files and folders starting with "ignore_"
+*ignore_*
