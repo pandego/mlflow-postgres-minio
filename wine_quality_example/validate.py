@@ -18,5 +18,5 @@ input_data = pyfunc_model.input_example
 mlflow.models.predict(
     model_uri=model_uri,
     input_data=input_data,
-    env_manager="conda",
+    env_manager="uv",
 )
