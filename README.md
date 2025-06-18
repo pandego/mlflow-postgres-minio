@@ -161,11 +161,11 @@ Pyenv is used with MLflow to manage different Python versions and packages in is
 - Finally, start your MLflow API by running the following command, replacing the `<RUN_ID>` for your own:
   ```bash
   conda activate mlflow_env
-  mlflow models serve -m <RUN_ID> -h 127.0.0.1 -p 1234 --timeout 0
+  mlflow models serve -m <RUN_ID> -h localhost -p 1234 --timeout 0
   ```
   - Let it run, it should look like this:
 
-  ![Model Serve Output](static/model_serve_output_conda.png)
+  ![Model Serve Output](static/model_serve_output_uv.png)
 
 #### 5.2 **Option 2:** Build and Run a containerized API
 Mlflow also allows you to build a dockerized API based on a model stored in one of your runs.
@@ -212,7 +212,7 @@ Mlflow also allows you to build a dockerized API based on a model stored in one 
 Let's now test the served model (API) we just built.
 - In a different terminal, send a request to test the served model:
     ```bash
-    curl -X POST -H "Content-Type: application/json" --data '{"dataframe_split": {"data": [[7.4,0.7,0,1.9,0.076,11,34,0.9978,3.51,0.56,9.4]], "columns": ["fixed acidity","volatile acidity","citric acid","residual sugar","chlorides","free sulfur dioxide","total sulfur dioxide","density","pH","sulphates","alcohol"]}}' http://127.0.0.1:1234/invocations
+    curl -X POST -H "Content-Type: application/json" --data '{"dataframe_split": {"data": [[7.4,0.7,0,1.9,0.076,11,34,0.9978,3.51,0.56,9.4]], "columns": ["fixed acidity","volatile acidity","citric acid","residual sugar","chlorides","free sulfur dioxide","total sulfur dioxide","density","pH","sulphates","alcohol"]}}' http://localhost:1234/invocations
     ```
 - The output should be something like the following:
     ```bash
