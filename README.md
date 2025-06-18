@@ -14,7 +14,7 @@ Automatic setup and deploy a MLflow server. This includes:
 ___
 ## Pre-requisites
 ### `Ubuntu` or `MacOS` with the following installed:
-- [UV](https://docs.astral.sh/uv/) or [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) (I will be using `uv` here)
+- [uv](https://docs.astral.sh/uv/) or [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) (I will be using `uv` here)
 - [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/linux/)
 
 You could use `WSL2` on a `Windows` machine, as an alternative to an `Ubuntu` machine.
@@ -120,7 +120,7 @@ As before, this will depend on your Python package manager. The commands will be
 - Start your MLflow API by running the following command, replacing the `<RUN_ID>` for your own:
   ```bash
   source .venv/bin/activate
-  mlflow models serve -m <RUN_ID> -h 127.0.0.1 -p 1234 --timeout 0 --no-conda
+  mlflow models serve -m <RUN_ID> -h localhost -p 1234 --timeout 0 --no-conda
   ```
   - Let it run, it should look like this:
 
@@ -164,8 +164,8 @@ Pyenv is used with MLflow to manage different Python versions and packages in is
   mlflow models serve -m <RUN_ID> -h localhost -p 1234 --timeout 0
   ```
   - Let it run, it should look like this:
-
-  ![Model Serve Output](static/model_serve_output_uv.png)
+  
+    ![Model Serve Output](static/model_serve_output_conda.png)
 
 #### 5.2 **Option 2:** Build and Run a containerized API
 Mlflow also allows you to build a dockerized API based on a model stored in one of your runs.
