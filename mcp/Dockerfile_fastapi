@@ -1,0 +1,26 @@
+FROM python:3.11-slim-bookworm
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential curl git && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml uv.lock README.md ./
+COPY src/ ./src/
+
+# Install uv globally and use it to manage the venv
+RUN pip install uv \
+    && uv venv \
+    && uv sync
+
+# Add non-root user for security
+RUN useradd -ms /bin/bash appuser
+USER appuser
+
+# Add the virtualenv to PATH (optional but good practice) and set MLFLOW_URL
+ENV PATH="/app/.venv/bin:$PATH"
+ENV MLFLOW_URL="http://host.docker.internal:1234/invocations"
+
+# Run the script
+CMD ["uvicorn", "mcp_server_mlflow.fastapi_server:app", "--host=0.0.0.0", "--port=8000"]
