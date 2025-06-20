@@ -7,7 +7,13 @@ from mcp.server.fastmcp import FastMCP
 
 MLFLOW_URL = os.getenv("MLFLOW_URL", "http://localhost:1234/invocations")
 
-mcp = FastMCP("Wine Quality Server")
+mcp = FastMCP(
+    name="Wine Quality Server",
+    stateless_http=True,
+    host="0.0.0.0",
+    port=8000,
+    # json_response=True
+)
 
 
 @mcp.tool(

@@ -14,6 +14,7 @@ RUN pip install uv \
     && uv venv \
     && uv sync
 
+# Add non-root user for security
 RUN useradd -ms /bin/bash appuser
 USER appuser
 
